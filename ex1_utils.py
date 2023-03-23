@@ -67,7 +67,6 @@ def show_img(img, normalized=False):
     if normalized:
         img = img * 255
     cv2.imshow('img', img)
-    cv2.waitKey(0)
     
 
 def image_spatial_derivates(im1, im2):

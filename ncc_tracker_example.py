@@ -2,12 +2,12 @@ import numpy as np
 import cv2
 
 from ex2_utils import Tracker
-
+from ex1_utils import show_img
 
 class NCCTracker(Tracker):
 
     def initialize(self, image, region):
-
+        print(region)
         if len(region) == 8:
             x_ = np.array(region[::2])
             y_ = np.array(region[1::2])

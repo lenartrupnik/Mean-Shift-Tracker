@@ -28,14 +28,18 @@ def mean_shift(img, patch_center, kernel_size, conv_threshold = 0.01):
     
 
 def create_kernels(kernel_size):
-    xi = np.zeros(kernel_size)
-    yi = np.zeros(kernel_size)
+    xi = np.zeros((kernel_size[1], kernel_size[0]))
+    yi = np.zeros((kernel_size[1], kernel_size[0]))
     
-    kernel_range = (kernel_size[0]-1)/2
-    weights = np.arange(-kernel_range, kernel_range + 1)
-    for i in range(xi.shape[0]):
-        xi[:, i] = weights[i]
-        yi[i, :] = weights[i]
+    width = (kernel_size[1]-1)/2
+    height = (kernel_size[0]-1)/2
+    weights_width = np.arange(-width, width + 1)
+    weights_height = np.arange(-height, height + 1)
+    for i in range(xi.shape[1]):
+        xi[:, i] = weights_height[i]
+        
+    for i in range(yi.shape[0]):
+        yi[i, :] = weights_width[i]
     
     return xi, yi
 

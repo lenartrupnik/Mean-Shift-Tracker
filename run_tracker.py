@@ -4,12 +4,12 @@ import cv2
 
 from sequence_utils import VOTSequence
 from ncc_tracker_example import NCCTracker, NCCParams
-#from ms_tracker import MeanShiftTracker, MSParams
+from ms_tracker import MeanShiftTracker, MSParams
 
 
 # set the path to directory where you have the sequences
 dataset_path = 'data\\' # TODO: set to the dataet path on your disk
-sequence = 'hand'  # choose the sequence you want to test
+sequence = 'bicycle'  # choose the sequence you want to test
 
 # visualization and setup parameters
 win_name = 'Tracking window'
@@ -23,10 +23,10 @@ sequence = VOTSequence(dataset_path, sequence)
 init_frame = 0
 n_failures = 0
 # create parameters and tracker objects
-parameters = NCCParams()
-tracker = NCCTracker(parameters)
-#parameters = MSParams()
-#tracker = MeanShiftTracker(parameters)
+#parameters = NCCParams()
+#tracker = NCCTracker(parameters)
+parameters = MSParams(16)
+tracker = MeanShiftTracker(parameters)
 
 time_all = 0
 
@@ -40,7 +40,7 @@ while frame_idx < sequence.length():
     if frame_idx == init_frame:
         # initialize tracker (at the beginning of the sequence or after tracking failure)
         t_ = time.time()
-        tracker.initialize(img, sequence.get_annotation(frame_idx, type='rectangle'))
+        tracker.initialize(img, sequence.get_annotation(frame_idx, type='rectangle'), norm_back = True)
         time_all += time.time() - t_
         predicted_bbox = sequence.get_annotation(frame_idx, type='rectangle')
     else:

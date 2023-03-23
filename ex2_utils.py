@@ -52,7 +52,16 @@ def create_epanechnik_kernel(width, height, sigma):
     kernel[kernel<0] = 0
     return kernel
 
-def extract_histogram(patch, nbins, weights=None):
+def norm_hist(image, position, bins, size,  delta = 30):
+    patch, _ = get_patch(image, position, size)
+    patch_back,_ = get_patch(image, position, (size[0] + delta, size[1] + delta))
+    histogram = extract_histogram(patch, bins)
+    histogram_back = extract_histogram(patch_back, bins)
+    c = np.divide(histogram, histogram_back)
+    return np.nan_to_num(c)
+
+
+def extract_histogram(patch, nbins, weights=None, norm = None):
     # Note: input patch must be a BGR image (3 channel numpy array)
     # convert each pixel intensity to the one of nbins bins
     channel_bin_idxs = np.floor((patch.astype(np.float32) / float(255)) * float(nbins - 1))
@@ -67,6 +76,10 @@ def extract_histogram(patch, nbins, weights=None):
     # zero-pad histogram (needed since bincount function does not generate histogram with nbins**3 elements)
     histogram = np.zeros((nbins**3, 1), dtype=histogram_.dtype).flatten()
     histogram[:histogram_.size] = histogram_
+    
+    if norm != None:
+        norm/histogram
+
     return histogram
 
 def backproject_histogram(patch, histogram, nbins):
@@ -91,11 +104,21 @@ def show_mean_shift_progression(img, patch, patch_center, new_patch_center):
     img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
     img = cv2.rectangle(img, patch_start, patch_end, (0,255,0), 1)
     img = cv2.rectangle(img, new_patch_start, new_patch_end, (0,0,255), 1)
-    show_img(img, True)
+    show_img(img)
 
+
+class MSParams():
+    def __init__(self, bins, sigma = 0.4, epsilon = 0.1, threshold = 1, enlarge_factor=2):
+        self.bins = bins
+        self.sigma = sigma
+        self.epsilon = epsilon
+        self.threshold = threshold
+        self.enlarge_factor = enlarge_factor
 # base class for tracker
+
+
 class Tracker():
-    def __init__(self, params):
+    def __init__(self, params: MSParams):
         self.parameters = params
 
     def initialize(self, image, region):
@@ -103,3 +126,20 @@ class Tracker():
 
     def track(self, image):
         raise NotImplementedError
+    
+    
+def create_uniform_kernel(width, height, sigma):
+    # make sure that width and height are odd
+    w2 = int(math.floor(width / 2))
+    h2 = int(math.floor(height / 2))
+
+    [X, Y] = np.meshgrid(np.arange(-w2, w2 + 1), np.arange(-h2, h2 + 1))
+    X = X / np.max(X)
+    Y = Y / np.max(Y)
+
+    kernel = (1 - ((X / sigma) ** 2 + (Y / sigma) ** 2))
+    kernel = kernel / np.max(kernel)
+    kernel[kernel < 0] = 0
+    kernel[kernel > 0] = 1
+    return kernel
+
