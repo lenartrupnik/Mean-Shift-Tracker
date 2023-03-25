@@ -12,6 +12,13 @@ def generate_responses_1():
     responses[50, 70] = 0.5
     return gausssmooth(responses, 10)
 
+def generate_responses_2():
+    responses = np.zeros((100, 100), dtype=np.float32)
+    responses[20, 20] = 1
+    responses[90, 70] = 1
+    responses[50, 50] = 0.5
+    return gausssmooth(responses, 10)
+
 def get_patch(img, center, sz):
     # crop coordinates
     x0 = round(int(center[0] - sz[0] / 2))
@@ -104,7 +111,7 @@ def show_mean_shift_progression(img, patch, patch_center, new_patch_center):
     img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
     img = cv2.rectangle(img, patch_start, patch_end, (0,255,0), 1)
     img = cv2.rectangle(img, new_patch_start, new_patch_end, (0,0,255), 1)
-    show_img(img)
+    show_img(img, wait=True)
 
 
 class MSParams():

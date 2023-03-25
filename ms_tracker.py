@@ -7,7 +7,7 @@ class MeanShiftTracker(Tracker):
         super().__init__(params)
 
         
-    def initialize(self, image, region, norm_back = False):
+    def initialize(self, image, region, background_norm = False):
         if len(region) == 8:
             x_ = np.array(region[::2])
             y_ = np.array(region[1::2])
@@ -31,12 +31,12 @@ class MeanShiftTracker(Tracker):
         self.size = (int(region[2]), int(region[3]))
         patch = image[int(top):int(bottom), int(left):int(right)]
         self.position = (region[0] + region[2] / 2, region[1] + region[3] / 2)
-        self.norm_back = norm_back
-        show_img(patch)
-        self.c = norm_hist(image, self.position, self.parameters.bins, self.size) if norm_back else None
+        self.norm_back = background_norm
+        #show_img(patch)
+        self.c = norm_hist(image, self.position, self.parameters.bins, self.size) if background_norm else None
         self.template = patch
         his_ = extract_histogram(patch, self.parameters.bins)
-        self.q =  his_ * self.c if norm_back else his_
+        self.q =  his_ * self.c if background_norm else his_
         self.kernel = create_uniform_kernel(self.size[0], self.size[1], 0.4)
 
         

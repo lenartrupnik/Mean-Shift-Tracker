@@ -63,10 +63,10 @@ def rotate_image(img, angle):
     rotated = cv2.warpAffine(img, rot_mat, img.shape[1::-1], flags=cv2.INTER_LINEAR)
     return rotated
 
-def show_img(img, normalized=False):
-    if normalized:
-        img = img * 255
+def show_img(img, wait=False):
     cv2.imshow('img', img)
+    if wait:
+        cv2.waitKey(0)
     
 
 def image_spatial_derivates(im1, im2):
