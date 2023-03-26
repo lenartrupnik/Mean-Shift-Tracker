@@ -74,6 +74,6 @@ class MeanShiftTracker(Tracker):
             N += 1
         
         if update_q:
-            self.q = self.q + 0.1 * p
+            self.q = 0.95 * +   self.q + 0.05 * p
     
         return self.position[0] - self.size[0] / 2, self.position[1] - self.size[1] / 2, self.size[0], self.size[1]
