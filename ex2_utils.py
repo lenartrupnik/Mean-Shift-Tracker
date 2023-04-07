@@ -1,9 +1,8 @@
 import math
-
 import numpy as np
 import cv2
-
 from ex1_utils import gausssmooth, show_img
+import matplotlib.pyplot as plt
 
 
 def generate_responses_1():
@@ -58,6 +57,7 @@ def create_epanechnik_kernel(width, height, sigma):
     kernel = kernel / np.max(kernel)
     kernel[kernel<0] = 0
     return kernel
+
 
 def norm_hist(image, position, bins, size,  delta = 30):
     patch, _ = get_patch(image, position, size)
@@ -114,15 +114,25 @@ def show_mean_shift_progression(img, patch, patch_center, new_patch_center):
     show_img(img, wait=True)
 
 
+def plot_parameters(x, y, title:str):
+    plt.plot(x, y, 'ro-')
+    plt.title(title)
+    plt.xlabel("Epsilon")
+    plt.ylabel("Failures")
+    plt.xscale('log')
+    plt.grid()
+    plt.savefig("epsilon.jpg")
+    plt.show()
+    
+    
 class MSParams():
-    def __init__(self, bins, sigma = 0.4, epsilon = 0.1, threshold = 1, enlarge_factor=2):
+    def __init__(self, bins=16, sigma = 0.5, epsilon = 0.1, threshold = 1, enlarge_factor=2):
         self.bins = bins
         self.sigma = sigma
         self.epsilon = epsilon
         self.threshold = threshold
         self.enlarge_factor = enlarge_factor
 # base class for tracker
-
 
 class Tracker():
     def __init__(self, params: MSParams):
@@ -133,20 +143,22 @@ class Tracker():
 
     def track(self, image):
         raise NotImplementedError
-    
-    
-def create_uniform_kernel(width, height, sigma):
-    # make sure that width and height are odd
-    w2 = int(math.floor(width / 2))
-    h2 = int(math.floor(height / 2))
 
+
+def create_cosine_window(target_size):
+    # target size is in the format: (width, height)
+    # output is a matrix of dimensions: (width, height)
+    return cv2.createHanningWindow((target_size[0], target_size[1]), cv2.CV_32F)
+
+def create_gauss_peak(target_size, sigma):
+    # target size is in the format: (width, height)
+    # sigma: parameter (float) of the Gaussian function
+    # note that sigma should be small so that the function is in a shape of a peak
+    # values that make sens are approximately from the interval: ~(0.5, 5)
+    # output is a matrix of dimensions: (width, height)
+    w2 = math.floor(target_size[0] / 2)
+    h2 = math.floor(target_size[1] / 2)
     [X, Y] = np.meshgrid(np.arange(-w2, w2 + 1), np.arange(-h2, h2 + 1))
-    X = X / np.max(X)
-    Y = Y / np.max(Y)
-
-    kernel = (1 - ((X / sigma) ** 2 + (Y / sigma) ** 2))
-    kernel = kernel / np.max(kernel)
-    kernel[kernel < 0] = 0
-    kernel[kernel > 0] = 1
-    return kernel
-
+    G = np.exp(-X**2 / (2 * sigma**2) - Y**2 / (2 * sigma**2))
+    G = np.roll(G, (-h2, -w2), (0, 1))
+    return G
