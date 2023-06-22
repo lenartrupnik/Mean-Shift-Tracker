@@ -1,0 +1,17 @@
+# Object file
+*.o
+
+# Ada Library Information
+*.ali
+data/
+__pycache__/
+bins.jpg
+epsilon.jpg
+first_setup.png
+list.txt
+setup_00.png
+test.py
+.vscode/settings.json
+bicycle/
+oddaja/
+results.txt

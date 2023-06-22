@@ -21,7 +21,6 @@ class MeanShiftTracker(Tracker):
         if region[3] % 2 == 0:
             region[3] -= 1
             
-            
         self.window = max(region[2], region[3]) * self.parameters.enlarge_factor
         left = max(region[0], 0)
         top = max(region[1], 0)
@@ -37,7 +36,7 @@ class MeanShiftTracker(Tracker):
         self.template = patch
         his_ = extract_histogram(patch, self.parameters.bins)
         self.q =  his_ * self.c if background_norm else his_
-        self.kernel = create_uniform_kernel(self.size[0], self.size[1], 0.4)
+        self.kernel = create_epanechnik_kernel(self.size[0], self.size[1], self.parameters.sigma)
 
         
     def track(self, image, update_q = True):
@@ -70,6 +69,7 @@ class MeanShiftTracker(Tracker):
             
             if math.isnan(x_step) or math.isnan(y_step):
                 break
+            
             self.position = self.position[0] + x_step, self.position[1] + y_step
             N += 1
         

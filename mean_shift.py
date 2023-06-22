@@ -4,6 +4,7 @@ from ex1_utils import show_img
 from ex2_utils import *
 GROUND_TRUTH = [(70,50), (50,70)]
 
+
 def mean_shift(img, patch_center= (50,50), kernel_size=(10,10), conv_threshold = 0.1, analyze=False):
     """
     Parameters: 
@@ -99,7 +100,7 @@ def calc_error(location):
     return min(distances)
 
 
-def plot_custom():
+def plot_custom_function():
     response = generate_responses_2()
     start = (35, 41)
     _, end_0 = mean_shift(response, start, (5,5), 0.05, True)

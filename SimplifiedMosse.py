@@ -4,7 +4,7 @@ from ex3_utils import *
 from numpy.fft import fft2, ifft2
 
 class CorelationParams():
-    def __init__(self, enlarge_factor=1, sigma = 4, lmbd = 1, alfa = 0.1):
+    def __init__(self, enlarge_factor=1.5, sigma = 4, lmbd = 1, alfa = 0.1):
         self.enlarge_factor = enlarge_factor
         self.sigma = sigma
         self.lmbd = lmbd
@@ -61,9 +61,9 @@ class CorrelationTracker(Tracker):
         y_max, x_max = np.unravel_index(R.argmax(), R.shape)
         
         # Compensate for inverted Gaussian
-        if x_max >= patch.shape[0] / 2:
+        if x_max > patch.shape[0] / 2:
             x_max = x_max - patch.shape[0]
-        if y_max >= patch.shape[1] / 2:
+        if y_max > patch.shape[1] / 2:
             y_max = y_max - patch.shape[1]
             
         # Update new location

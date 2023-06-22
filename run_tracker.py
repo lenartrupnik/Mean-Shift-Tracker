@@ -4,6 +4,9 @@ import cv2
 from sequence_utils import VOTSequence
 from ncc_tracker_example import NCCTracker, NCCParams
 from ms_tracker import MeanShiftTracker, MSParams
+from ex2_utils import plot_parameters
+from SimplifiedMosse import CorrelationTracker
+
 
 def run_tracker(params:MSParams):
     # set the path to directory where you have the sequences
@@ -26,7 +29,7 @@ def run_tracker(params:MSParams):
     #tracker = NCCTracker(parameters)
     parameters = params
 
-    tracker = MeanShiftTracker(parameters)
+    tracker = CorrelationTracker(parameters)
 
     time_all = 0
 
@@ -41,8 +44,7 @@ def run_tracker(params:MSParams):
             # initialize tracker (at the beginning of the sequence or after tracking failure)
             t_ = time.time()
             tracker.initialize(img, 
-                            sequence.get_annotation(frame_idx, type='rectangle'), 
-                            background_norm = True)
+                            sequence.get_annotation(frame_idx, type='rectangle'))
             time_all += time.time() - t_
             predicted_bbox = sequence.get_annotation(frame_idx, type='rectangle')
         else:
@@ -78,10 +80,19 @@ def run_tracker(params:MSParams):
 
 
 if __name__ == '__main__':
-    n_failures = []
-    bins = np.arange(2, 32, 2)
-    for bin in bins:
-        n_failures.append(run_tracker(MSParams(
-            bins = bin
-        )))
-    print(n_failures)
+    run_tracker(MSParams(bins=10))
+    # n_failures = []
+    # bins = np.arange(2, 32, 2)
+    # thresholds = np.arange(0.2, 2.2, 0.2)
+    # epsilons = [0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 5]
+    # enlarge_facors = np.arange(1, 5, 1)
+    # for bin in bins:
+    #     n_failures.append(run_tracker(MSParams(
+    #         bins = bin
+    #     )))
+    # with open('results.txt', '+a') as f:
+    #     f.write(f'\n{n_failures}')
+    #     f.close
+    # print(n_failures)
+    
+    # plot_parameters(epsilons, n_failures, "Failures in relation to epsilon parameter.")
